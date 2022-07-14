@@ -1,57 +1,101 @@
-# Template para projetos Java usando o Visual Studio Code
+# 1.5 // Objetos, Estado e Comportamento // ATM
 
-Um _template_ é um projeto base, para não iniciar do zero e ter pelo menos uma estrutura mínima onde se apoiar.
+Use este link do GitHub Classroom para ter sua cópia alterável deste repositório: <>
 
-Antes de começar a desenvolver com este _template_ é necessário ter instalado o Java Software Development Kit (JDK), o editor Visual Studio Code (VSCode) e o utilitário de controle de versão de código _Git_.
+Implementar respeitando os fundamentos de Orientação a Objetos.
 
+**Tópicos desta atividade:** abstrações, classes, objetos, construtores, validade, atributos, estado, comportamento, comandos e consultas, excepcionalidades e especificações.
 
+---
 
-## Instalação e Configuração do JDK
+Considere a especificação de um **Caixa Eletrônico** (Automatic Teller Machine - ATM) e um _software_ que opere no _hardware_, ou seja, as contas, cartões, senhas e outras informações bancárias são irrelevantes, importando apenas o tratamento do abastecimento de dinheiro físico (em espécie) do **ATM** e subsequentes retiradas.
 
-É necessário instalar o JDK a partir da versão 8, porém é recomendada versão 11-LTS (Long Term Support - suporte de longo prazo) ou até mesmo a 17-LTS.
+Considere que o **ATM** têm 5 compartimentos internos (1 a 5) cada um com capacidade para até 100 cédulas de `R$ 5,00`, `R$ 10,00`, `R$ 20,00`, `R$ 50,00` e `R$ 100,00` respectivamente. Os vigilantes abastecem o **ATM** com cédulas, no limite de cada compartimento, rejeitando abastecimentos que excedem esse limite.
 
-Para o Sistema Operacional (SO) Windows, ele pode ser obtido aqui <https://adoptium.net/?variant=openjdk11&jvmVariant=hotspot>. Siga as instruções de instalação e não esqueça de selecionar os opcionais durante o processo, especialmente a parte ⚠️ _"add Java to PATH"_.
+Os clientes fazem suas retiradas no **ATM**, sendo irrelevante a operação (saque conta corrente, poupança, empréstimo), bastanto apenas ter cédulas (dinheiro físico) disponível no **ATM** e sendo possível atender o valor informado _conforme a combinação disponível de cédulas_, isto é: se o cliente solicitar `R$ 60,00` o **ATM** pode entregar 3 cédulas de `R$ 20`, uma de `R$ 50,00` e uma de `R$ 10,00`.
 
-Para Sistemas Operacionais Linux/Debian, como Ubuntu, Pop OS, Mint, Elementary, etc, execute no terminal o comando `sudo apt install openjdk-11-jdk`, que a mágica vai acontecer.
+Se, por exemplo, o **ATM** estiver abastecido apenas com cédulas de `R$ 50,00` e `R$ 100,00` ele não poderá atender à solicitação de retirada de `R$ 60,00`, rejeitando a mesma.
 
-Para testar a instalação, seja no Windows ou Linux, abra o _Prompt_ de Comando (cmd) ou o Terminal e execute o compilador Java com `javac -version`. A saída deve ser algo com `javac 11.0.9.1`, ou outra versão.
+O algoritmo de retirada deve priorizar a saída de cédulas de maior valor. O **ATM** deve ter, ainda, uma interface para consultar o valor total e quantidade de cédulas de cada compartimento.
 
-
-
-## Instalação e Configuração do Visual Studio Code (VSCode)
-
-O VSCode pode ser obtido aqui: <https://code.visualstudio.com/download>. A instalação é semelhante nos Sistemas Operacionais Windows e Linux.
-
-No Windows, abra o instalador e não esqueça de selecionar todos os opcionais, como _adicionar code ao path_ e _adicionar "abrir com code" ao menu_, por exemplo.
-
-No Linux, abra o arquivo `.deb` baixado no gerenciador de pacotes e instale normalmente conforme instruções de seu sistema operacional.
-
-Este _template_ possui uma pasta [.vscode](.vscode) com as extensões necessárias em [extensions.json](.vscode/extensions.json) e as configurações recomendadas em [settings.json](.vscode/settings.json) para um **ambiente de ensino** (configuração didática). Fique a vontade para alterá-los como achar melhor.
-
-A única extensão obrigatória é a _"vscjava.vscode-java-pack"_.
-
-A extensão _"EditorConfig"_ é bastante recomendada. Ela funciona junto com o arquivo [.editorconfig](.editorconfig) presente neste _template_ para padronizar a formatação dos códigos-fonte.
-
-Finalmente, se preferes o editor em Português, instale a extensão _Portuguese (Brazil) Language Pack for Visual Studio Code_.
+Dada essa especificação, a implementação deve aderir aos seguintes casos de teste que demonstram a  interação básica com o ATM e **devem ser introduzidos mais casos teste que realizem retiradas que combinem 3, 4 e 5 cédulas, válidas e inválidas.**
 
 
+```java
+ATM atm = new ATM();
 
-## Instalação e Configuração do Git
+// abastecendo com 20 notas de 100
+atm.abastecer(33, 100);
 
-O Git para Windows pode ser obtido neste link: <https://git-scm.com/download/win>. A instalação é simples e intuitiva. Como sempre, não esqueça dos opcionais, principalmente a opção _adicionar o git ao path_!
+// verificando a quantidade de cédulas de 100
+System.out.println(atm.consultarQuantidade(100)); // 33
 
-Para Linux, o comando `sudo apt install git` no terminal faz tudo.
+// espera-se 33 cédulas
+System.out.println(atm.consultarQuantidade(100) == 33);
 
-Para verificar a instalação abra o _prompt_ ou um terminal e execute `git --version`. Se não acusou _"comando não encontrado"_ é porque está tudo funcionando perfeitamente.
+// espera-se nenhuma cédula de qualquer outro valor
+System.out.println(atm.consultarQuantidade(5)); // 0
+System.out.println(atm.consultarQuantidade(5) == 0);
+System.out.println(atm.consultarQuantidade(50)); // 0
+System.out.println(atm.consultarQuantidade(50) == 0);
 
+// mesmo de cédulas que não existem
+System.out.println(atm.consultarQuantidade(3)); // 0
+System.out.println(atm.consultarQuantidade(3) == 0);
 
+// abastecimento de cédulas não existentes são rejeitados
+atm.abastecer(8, 3); // 8 cédulas de R$ 3,00
+System.out.println(atm.consultarQuantidade(3) == 0);
 
-## Códigos-fonte
+// consultando o valor
+System.out.println(atm.consultarValor()); // 33 * 100 = 3300 reais
+System.out.println(atm.consultarValor() == 3300);
 
-Considere adicionar os arquivos de código-fonte `.java` no diretório [src](./src/), como o exemplo [src/App.java](./src/App.java).
+// retirada rejeitada
+atm.retirar(350); // não há cédulas de R$ 50,00
+System.out.println(atm.consultarQuantidade(100) == 33);
+System.out.println(atm.consultarValor() == 3300);
 
+// retirada válida
+atm.retirar(300); // 3 cédulas de 100
+System.out.println(atm.consultarQuantidade(100) == 30);
+System.out.println(atm.consultarValor() == 3000);
 
+// retirada rejeitada
+atm.retirar(3100); // não há cédulas suficientes
+System.out.println(atm.consultarQuantidade(100) == 30);
+System.out.println(atm.consultarValor() == 3000);
 
-## Licenciamento
+// retirada válida
+atm.retirar(3000); // vai esvaziar o ATM
+System.out.println(atm.consultarQuantidade(100) == 0);
+System.out.println(atm.consultarValor() == 0);
 
-Este _template_ é _open source_ licenciado sob a GPL, assim como todos os projetos derivados dele. Mais detalhes em [LICENÇA.md](LICENÇA.md).
+// abastecimento de R$ 50,00 e R$ 10,00
+atm.abastecer(10, 10); // 10 cédulas de R$ 10,00
+atm.abastecer(10, 50); // 10 cédulas de R$ 50,00
+System.out.println(atm.consultarQuantidade(10) == 10);
+System.out.println(atm.consultarQuantidade(50) == 10);
+System.out.println(atm.consultarValor() == 600); // 10 * 10 + 10 * 50
+
+// retirada prioriza cédulas de maior valor
+atm.retirar(100); // retira 2 cédulas de R$ 50,00
+System.out.println(atm.consultarQuantidade(10) == 10);
+System.out.println(atm.consultarQuantidade(50) == 8);
+System.out.println(atm.consultarValor() == 500); // 10 * 10 + 8 * 50
+
+// retirada combinada
+atm.retirar(90); // 1 cédula de R$ 50,00 e 4 cédulas de R$ 10,00
+System.out.println(atm.consultarQuantidade(50) == 7);
+System.out.println(atm.consultarQuantidade(10) == 6);
+System.out.println(atm.consultarValor() == 410); // 6 * 10 + 7 * 50
+
+// incluir casos de teste pessoais com retiradas
+// quem combinam 3, 4 e 5 cédulas, válidas e inválidas
+```
+
+### Observações
+
+1. Os compartimentos não devem permitir o acesso direto, em outras palavras, a quantidade de cédulas só pode ser alterada através de abastecimentos e retiradas;
+2. Existem outras situações inválidas, seus testes não são obrigatórios na atividade, mas é um diferencial qualitativo se forem implementados;
+3. Os casos de teste não podem ser alterados, mas outros podem ser adicionados. Fique a vontade para adicionar códigos que imprimem ou separam os testes, por exemplo.
